@@ -62,38 +62,68 @@ function createEmbed (repo, branch, url, commits, size) {
   } else {
     latest.author.avatar = `https://github.com/${latest.author.username}.png?size=32`
   }
+
+  const changeLog = getChangeLog(branch, commits, size);
+
   return new MessageEmbed()
     .setColor(0x00bb22)
     .setURL(url)
     .setAuthor({
       name: `${size} ${
         size === 1 ? 'commit was' : 'commits were'
-      } added to ${branch}`,
+      } added to ${changeLog[0]}`,
       iconURL: latest.author.avatar,
     })
-    .setDescription(`${getChangeLog(commits, size)}`)
+    .setDescription(`${changeLog[1]}`)
     .setTimestamp(Date.parse(latest.timestamp))
     .setFooter({
       text: `⚡ Edited by @${latest.author.username}`
     })
 }
 
-function getChangeLog (commits, size) {
-  let changelog = ''
+function getChangeLog(branch, commits, size) {
+  let changelog = '';
+
   for (const i in commits) {
     if (i > 7) {
-      changelog += `+ ${size - i} more...\n`
-      break
+      changelog += `+ ${size - i} more...\n`;
+      break;
     }
 
-    const commit = commits[i]
-    const sha = commit.id.substring(0, 6)
-    const message =
-      commit.message.length > MAX_MESSAGE_LENGTH
-        ? commit.message.substring(0, MAX_MESSAGE_LENGTH) + '...'
-        : commit.message
-    changelog += `[\`${sha}\`](${commit.url}) — ${message}\n`
+    const commit = commits[i];
+    const sha = commit.id.substring(0, 6);
+    let message = commit.message;
+
+    // Obfuscate message if it starts with '%'
+    if (message.startsWith('%')) {
+      message = obfuscateMessage(message);
+      branch = obfuscateMessage(branch);
+    } else if (message.length > MAX_MESSAGE_LENGTH) {
+      message = message.substring(0, MAX_MESSAGE_LENGTH) + '...';
+    }
+
+    // Replace spaces with '▌'
+    message = message.replace(/ /g, '▌');
+
+    changelog += `[${sha}](${commit.url}) — ${message}\n`;
   }
 
-  return changelog
+  return changelog;
+}
+
+// Function to obfuscate message starting with '%'
+function obfuscateMessage(message) {
+  const specialChars = ['▍', '▋', '▊', '▄', '▅', '▇', '█', '▆', '▉'];
+  let obfuscatedMessage = '';
+
+  for (let i = 0; i < message.length; i++) {
+    const char = message.charAt(i);
+    if (i < specialChars.length) {
+      obfuscatedMessage += message.charAt(i).replace(/./, specialChars[i]);
+    } else {
+      obfuscatedMessage += char;
+    }
+  }
+
+  return obfuscatedMessage;
 }
