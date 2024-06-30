@@ -96,16 +96,23 @@ function getChangeLog(branch, commits, size) {
     const sha = commit.id.substring(0, 6);
     let message = commit.message;
 
-    // Obfuscate message if it starts with '%'
+    // obfuscate message if it starts with '%'
     if (message.startsWith('%')) {
+      if(message.startsWith('% ')) {
+        message = message.replace("% ", "")
+      }
+      message = message.replace("%", "")
+
       message = obfuscateMessage(message);
       branch = obfuscateMessage(branch);
-    } else if (message.length > MAX_MESSAGE_LENGTH) {
+
+      // replace spaces with '▌'
+      message = message.replace(/ /g, '▌');
+    }
+    
+    if (message.length > MAX_MESSAGE_LENGTH) {
       message = message.substring(0, MAX_MESSAGE_LENGTH) + '...';
     }
-
-    // Replace spaces with '▌'
-    message = message.replace(/ /g, '▌');
 
     changelog += `[${sha}](${commit.url}) — ${message}\n`;
   }
@@ -120,18 +127,10 @@ function obfuscateMessage(message) {
   let obfuscatedMessage = '';
 
   for (let i = 0; i < message.length; i++) {
-    const char = message.charAt(i);
-    if(char == ' ') {
-      continue;
-    }
-    if (i < specialChars.length) {
-      obfuscatedMessage += message.charAt(i).replace(/./, specialChars[i]);
-    } else {
-      obfuscatedMessage += char;
-    }
+    // pick a random index from specialChars for each character encountered
+    const randomIndex = Math.floor(Math.random() * specialChars.length);
+    obfuscatedMessage += specialChars[randomIndex];
   }
 
-  
   return obfuscatedMessage;
 }
-
