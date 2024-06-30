@@ -63,7 +63,7 @@ function createEmbed (repo, branch, url, commits, size) {
     latest.author.avatar = `https://github.com/${latest.author.username}.png?size=32`
   }
 
-  const changeLog = getChangeLog(branch, commits, size);
+  const changeLog = getChangeLog(repo, branch, commits, size);
 
   return new MessageEmbed()
     .setColor(0x00bb22)
