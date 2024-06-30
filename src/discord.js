@@ -67,7 +67,7 @@ function createEmbed (repo, branch, url, commits, size) {
 
   return new MessageEmbed()
     .setColor(0x00bb22)
-    .setURL(url)
+    //.setURL(url)
     .setAuthor({
       name: `${size} ${
         size === 1 ? 'commit was' : 'commits were'
@@ -108,16 +108,19 @@ function getChangeLog(branch, commits, size) {
     changelog += `[${sha}](${commit.url}) — ${message}\n`;
   }
 
-  return changelog;
+  return [branch, changelog];
 }
 
 // Function to obfuscate message starting with '%'
 function obfuscateMessage(message) {
-  const specialChars = ['▍', '▋', '▊', '▄', '▅', '▇', '█', '▆', '▉'];
+  const specialChars = ['▋', '▊', '▄', '▅', '▇', '█', '▆', '▉'];
   let obfuscatedMessage = '';
 
   for (let i = 0; i < message.length; i++) {
     const char = message.charAt(i);
+    if(char == ' ') {
+      continue;
+    }
     if (i < specialChars.length) {
       obfuscatedMessage += message.charAt(i).replace(/./, specialChars[i]);
     } else {
