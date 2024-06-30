@@ -96,12 +96,16 @@ function getChangeLog(branch, commits, size) {
     const sha = commit.id.substring(0, 6);
     let message = commit.message;
 
+    let obfuscated = false;
+
     // obfuscate message if it starts with '%'
     if (message.startsWith('%')) {
       if(message.startsWith('% ')) {
         message = message.replace("% ", "")
       }
       message = message.replace("%", "")
+
+      obfuscated = true;
 
       message = obfuscateMessage(message);
       branch = obfuscateMessage(branch);
@@ -114,7 +118,11 @@ function getChangeLog(branch, commits, size) {
       message = message.substring(0, MAX_MESSAGE_LENGTH) + '...';
     }
 
-    changelog += `[${sha}](${commit.url}) — ${message}\n`;
+    if(obfuscated) {
+      changelog += `\`${sha}\` — ${message}\n`;
+    } else {
+      changelog += `\`[${sha}](${commit.url})\` — ${message}\n`;
+    }
   }
 
   return [branch, changelog];
@@ -123,7 +131,7 @@ function getChangeLog(branch, commits, size) {
 
 // Function to obfuscate message starting with '%'
 function obfuscateMessage(message) {
-  const specialChars = ['▋', '▊', '▄', '▅', '▇', '█', '▆', '▉'];
+  const specialChars = ['▄', '▅', '▇', '█', '▉'];
   let obfuscatedMessage = '';
 
   for (let i = 0; i < message.length; i++) {
