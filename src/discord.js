@@ -71,7 +71,7 @@ function createEmbed (repo, branch, url, commits, size) {
     .setAuthor({
       name: `${size} ${
         size === 1 ? 'commit was' : 'commits were'
-      } added to ${changeLog[0]}`,
+      } added to ${repo}/${changeLog[0]}`,
       iconURL: latest.author.avatar,
     })
     .setDescription(`${changeLog[1]}`)
