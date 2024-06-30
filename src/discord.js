@@ -71,17 +71,17 @@ function createEmbed (repo, branch, url, commits, size) {
     .setAuthor({
       name: `${size} ${
         size === 1 ? 'commit was' : 'commits were'
-      } added to ${repo}/${changeLog[0]}`,
+      } added to ${changeLog[0]}/${changeLog[1]}`,
       iconURL: latest.author.avatar,
     })
-    .setDescription(`${changeLog[1]}`)
+    .setDescription(`${changeLog[2]}`)
     .setTimestamp(Date.parse(latest.timestamp))
     .setFooter({
       text: `⚡ Edited by @${latest.author.username}`
     })
 }
 
-function getChangeLog(branch, commits, size) {
+function getChangeLog(repo, branch, commits, size) {
   let changelog = '';
 
   let obfuscated = false;
@@ -91,6 +91,8 @@ function getChangeLog(branch, commits, size) {
     let message = commit.message;
     if (message.startsWith('%')) {
       obfuscated = true;
+      branch = obfuscateMessage(branch);
+      repo = obfuscateMessage(repo);
     }
   }
 
@@ -109,7 +111,6 @@ function getChangeLog(branch, commits, size) {
     // obfuscate message if it starts with '%'
     if (obfuscated) {
       message = obfuscateMessage(message);
-      branch = obfuscateMessage(branch);
 
       // replace spaces with '▌'
       message = message.replace(/ /g, '▌');
@@ -122,11 +123,12 @@ function getChangeLog(branch, commits, size) {
     if(obfuscated) {
       changelog += `\`${sha}\` — ${message}\n`;
     } else {
-      changelog += `[\`${sha}\`](${commit.url}) — ${message}\n`;
+      changelog += `\`${sha}\` — ${message}\n`;
+      //changelog += `[\`${sha}\`](${commit.url}) — ${message}\n`;
     }
   }
 
-  return [branch, changelog];
+  return [repo, branch, changelog];
 }
 
 
