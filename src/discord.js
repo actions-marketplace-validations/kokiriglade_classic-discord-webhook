@@ -117,6 +117,7 @@ function getChangeLog(branch, commits, size) {
     changelog += `[${sha}](${commit.url}) — ${message}\n`;
   }
 
+  
   return [branch, changelog];
 }
 
