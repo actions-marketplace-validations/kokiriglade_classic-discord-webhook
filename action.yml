@@ -1,5 +1,5 @@
-name: 'Classic Discord Webhook'
-description: 'This GitHub Action sends simple discord messages for your commits.'
+name: 'Obfuscated Commit Discord Webhook'
+description: 'This GitHub Action sends simple discord messages for your commits, and supports obfuscating ones you want to keep secret'
 branding:
   icon: git-commit
   color: blue
