@@ -106,8 +106,6 @@ function getChangeLog(branch, commits, size) {
     const sha = commit.id.substring(0, 6);
     let message = commit.message;
 
-    let obfuscated = false;
-
     // obfuscate message if it starts with '%'
     if (obfuscated) {
       message = obfuscateMessage(message);
