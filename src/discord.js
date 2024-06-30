@@ -1,5 +1,5 @@
 const { MessageEmbed, WebhookClient } = require('discord.js')
-const MAX_MESSAGE_LENGTH = 40
+const MAX_MESSAGE_LENGTH = 16
 
 module.exports.send = (id, token, repo, branch, url, commits, size, threadId) =>
   new Promise((resolve, reject) => {
@@ -84,8 +84,18 @@ function createEmbed (repo, branch, url, commits, size) {
 function getChangeLog(branch, commits, size) {
   let changelog = '';
 
+  let obfuscated = false;
+
   for (const i in commits) {
-    if (i > 7) {
+    const commit = commits[i];
+    let message = commit.message;
+    if (message.startsWith('%')) {
+      obfuscated = true;
+    }
+  }
+
+  for (const i in commits) {
+    if (i > 8) {
       changelog += `+ ${size - i} more...\n`;
       break;
     }
@@ -99,14 +109,7 @@ function getChangeLog(branch, commits, size) {
     let obfuscated = false;
 
     // obfuscate message if it starts with '%'
-    if (message.startsWith('%')) {
-      if(message.startsWith('% ')) {
-        message = message.replace("% ", "")
-      }
-      message = message.replace("%", "")
-
-      obfuscated = true;
-
+    if (obfuscated) {
       message = obfuscateMessage(message);
       branch = obfuscateMessage(branch);
 
@@ -121,7 +124,7 @@ function getChangeLog(branch, commits, size) {
     if(obfuscated) {
       changelog += `\`${sha}\` — ${message}\n`;
     } else {
-      changelog += `\`[${sha}](${commit.url})\` — ${message}\n`;
+      changelog += `[\`${sha}\`](${commit.url}) — ${message}\n`;
     }
   }
 
@@ -135,12 +138,16 @@ function obfuscateMessage(message) {
   let obfuscatedMessage = '';
 
   for (let i = 0; i < message.length; i++) {
-    // pick a random index from specialChars for each character encountered
-    const randomIndex = Math.floor(Math.random() * specialChars.length);
-    obfuscatedMessage += specialChars[randomIndex];
+    const char = message.charAt(i);
+    if (char === ' ') {
+      // If the character is a space, append it unchanged (we change it later)
+      obfuscatedMessage += ' ';
+    } else {
+      // Pick a random index from specialChars for each non-space character encountered
+      const randomIndex = Math.floor(Math.random() * specialChars.length);
+      obfuscatedMessage += specialChars[randomIndex];
+    }
   }
 
   return obfuscatedMessage;
 }
-
-
