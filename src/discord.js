@@ -90,7 +90,7 @@ function getChangeLog(branch, commits, size) {
       break;
     }
 
-    
+
 
     const commit = commits[i];
     const sha = commit.id.substring(0, 6);
@@ -133,3 +133,4 @@ function obfuscateMessage(message) {
 
   return obfuscatedMessage;
 }
+
